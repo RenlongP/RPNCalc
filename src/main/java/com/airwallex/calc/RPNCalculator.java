@@ -1,18 +1,18 @@
 package com.airwallex.calc;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.airwallex.common.Constant;
 import com.airwallex.common.ErrorCode;
 import com.airwallex.override.MyStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import static java.lang.System.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static java.lang.System.out;
 
 public class RPNCalculator {
 
@@ -37,23 +37,20 @@ public class RPNCalculator {
 		}
 
 		int execPos = 0;
-		for (String number : input.split(Constant.PARAM_DELIMITER)) {
-			Operator opr = Operator.find(number);
+		for (String ele : input.split(Constant.PARAM_DELIMITER)) {
+			Operator opr = Operator.find(ele);
 			try {
 				if (opr != null) {
 					calc(numbers, opr, execPos);
 				} else {
-					numbers.push(new BigDecimal(number));
+					numbers.push(new BigDecimal(ele));
 				}
-			} catch (NumberFormatException e) {
-
-				break;
 			} catch (Exception e) {
 				e.printStackTrace();
 				return -1;
 			}
 			logHistory((MyStack<BigDecimal>) numbers.clone());
-			execPos += number.length() + Constant.PARAM_DELIMITER.length();
+			execPos += ele.length() + Constant.PARAM_DELIMITER.length();
 		}
 		printstack();
 

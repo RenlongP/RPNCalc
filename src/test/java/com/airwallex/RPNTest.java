@@ -108,7 +108,7 @@ public class RPNTest {
 	@Test
 	public void testWrongInput() {
 		rpn.exec("1 2 3 4 5+");
-		assertResultEq("1 2 3 4", rpn);
+		assertResultEq("", rpn);
 	}
 
 	@Test
