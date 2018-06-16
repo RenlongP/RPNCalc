@@ -9,18 +9,33 @@ import java.util.List;
 import com.airwallex.common.Constant;
 import com.airwallex.common.ErrorCode;
 import com.airwallex.override.MyStack;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
-import static java.lang.System.out;
+import static java.lang.System.*;
 
 public class RPNCalculator {
 
 	private MyStack<BigDecimal> numbers = new MyStack<>();
 	private LinkedList<MyStack<BigDecimal>> history = new LinkedList<>();
-
+	private static final String DISPLAY_FORMAT = "#.##########";
 	private static final List<String> EXIT_CMD = Arrays.asList("quit", "q");
 
-
 	public int exec(String input) {
+
+		if(EXIT_CMD.contains(input.toLowerCase())) {
+			out.println("Exiting RPN Calculator. Bye!");
+			return Constant.EXIT_CODE_NORMAL_QUIT;
+		}
+
+		List<String> errorMsgs = new LinkedList<>();
+		if(!isValidInputString(input, errorMsgs)){
+			for (String errorMsg : errorMsgs) {
+				out.println(errorMsg);
+			}
+			return 0;
+		}
+
 		int execPos = 0;
 		for (String number : input.split(Constant.PARAM_DELIMITER)) {
 			Operator opr = Operator.find(number);
@@ -31,8 +46,7 @@ public class RPNCalculator {
 					numbers.push(new BigDecimal(number));
 				}
 			} catch (NumberFormatException e) {
-				String err = ErrorCode.WRONG_INPUT.getMessage(number);
-				System.out.println(err);
+
 				break;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -46,16 +60,35 @@ public class RPNCalculator {
 		return 0;
 	}
 
+	private boolean isValidInputString(String input, List<String> resultMsg) {
+		boolean isValid = true;
+		if(StringUtils.isEmpty(input)){
+			isValid = false;
+		}else {
+			List<String> invalidEles = new LinkedList<>();
+			for (String ele : input.split(Constant.PARAM_DELIMITER)) {
+				if(!Operator.isValidOperator(ele) && !NumberUtils.isNumber(ele)){
+					invalidEles.add(ele);
+				}
+			}
+			if (!invalidEles.isEmpty()) {
+				resultMsg.add(ErrorCode.WRONG_INPUT.getMessage(invalidEles));
+				isValid = false;
+			}
+		}
+		return isValid;
+	}
+
 	private void printstack() {
 		String info = "stack: " + getNumbers().toString();
-		System.out.println(info);
+		out.println(info);
 	}
 
 	public MyStack<BigDecimal> calc(MyStack<BigDecimal> numbers, Operator opr, int execPos) {
 		List<BigDecimal> calcArgs = new ArrayList<>();
 		if (numbers.size() < opr.getOperand()) {
 			String err = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
-			System.out.println(err);
+			out.println(err);
 			throw new IllegalStateException(err);
 		}
 		for (int i = 0; i < opr.getOperand(); i++) {
@@ -78,7 +111,7 @@ public class RPNCalculator {
 	private void undo() {
 		if (this.history.size() < 2) {
 			String err = "Undo operation failed since no enough history";
-			System.out.println(err);
+			out.println(err);
 			return;
 		}
 

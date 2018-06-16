@@ -26,7 +26,7 @@ public class MyStack<E> extends Stack<E> {
 			}
 		}
 		if (sb.length() < 1) {
-			return Constant.EMPTYSTR;
+			return "";
 		} else {
 			return sb.deleteCharAt(sb.length() - 1).toString();
 		}

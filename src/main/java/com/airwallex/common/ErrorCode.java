@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public enum ErrorCode {
 	PARAMETER_INSUFFICIENT("Operator {} (position: {}): insufficient parameters."),
-	WRONG_INPUT("The inputted element [{}] is neither number nor operator");
+	WRONG_INPUT("The inputted element {} is neither number nor operator");
 
 	private final String messagePattern;
 
@@ -18,7 +18,7 @@ public enum ErrorCode {
 
 	public String getMessage(Object... args) {
 		if (StringUtils.isEmpty(this.getMessagePattern())) {
-			return Constant.EMPTYSTR;
+			return "";
 		}
 		if (args == null || args.length <= 0) {
 			return this.getMessagePattern();

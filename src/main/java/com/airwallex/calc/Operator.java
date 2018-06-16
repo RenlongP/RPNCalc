@@ -63,9 +63,13 @@ public enum Operator {
 		}
 	}
 
+	public static boolean isValidOperator(String ele) {
+		return map.containsKey(ele);
+	}
+
 	public abstract BigDecimal apply(List<BigDecimal> numList);
 
-	private Operator(String operatorText, int operand) {
+	Operator(String operatorText, int operand) {
 		this.operatorText = operatorText;
 		this.operand = operand;
 	}

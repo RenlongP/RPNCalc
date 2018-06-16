@@ -6,7 +6,7 @@ import java.io.Console;
 
 import static java.lang.System.exit;
 
-public class RPNBootStrap {
+public class RPNBootstrap {
 
 	public static void main(String[] args) {
 		Console console = System.console();
@@ -21,7 +21,7 @@ public class RPNBootStrap {
 		while (exitCode == 0) {
 			exitCode = rpn.exec(console.readLine());
 		}
-		if(exitCode != Constant.ERR_CODE_NORMAL_QUIT){
+		if(exitCode != Constant.EXIT_CODE_NORMAL_QUIT){
 			exit(exitCode);
 		}
 	}
