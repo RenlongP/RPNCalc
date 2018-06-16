@@ -7,21 +7,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.airwallex.calc.RPN;
+import com.airwallex.calc.RPNCalculator;
 import com.airwallex.common.ErrorCode;
 
 public class RPNTest {
-	private RPN rpn;
+	private RPNCalculator rpn;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Before
 	public void initRPN() {
-		rpn = new RPN();
+		rpn = new RPNCalculator();
 	}
 
-	private void assertResultEq(String expect, RPN rpn) {
+	private void assertResultEq(String expect, RPNCalculator rpn) {
 		assertEquals(expect, rpn.getNumbers().toString());
 	}
 
@@ -101,7 +101,7 @@ public class RPNTest {
 
 	@Test
 	public void testTooMuchUndo() {
-		rpn.exec("1 2 3").exec("undo undo").exec("undo");
+		rpn.exec("1 2 3 undo undo undo");
 		assertResultEq("1", rpn);
 	}
 
