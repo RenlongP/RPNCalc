@@ -42,7 +42,7 @@ public class RPNCalculator {
             Operator opr = Operator.find(ele);
             try {
                 if (opr != null) {
-                    calc(workingDir, opr, execPos);
+                    calc(opr, execPos);
                 } else {
                     workingDir.push(new BigDecimal(ele));
                 }
@@ -78,7 +78,7 @@ public class RPNCalculator {
     }
 
     private void printstack() {
-        out.println("stack: "+ getStackContents());
+        out.println("stack: " + getStackContents());
     }
 
     public String getStackContents() {
@@ -93,30 +93,29 @@ public class RPNCalculator {
             }
             sb.append(Constant.PARAM_DELIMITER);
         }
-        if(sb.length()>0){
+        if (sb.length() > 0) {
             sb.deleteCharAt(sb.length() - 1);
         }
         return sb.toString();
     }
 
-    public Stack<BigDecimal> calc(Stack<BigDecimal> numbers, Operator opr, int execPos) {
+    public Stack<BigDecimal> calc(Operator opr, int execPos) {
         List<BigDecimal> calcArgs = new ArrayList<>();
-        if (numbers.size() < opr.getOperand()) {
+        if (!opr.executable(workingDir, mamoPad)) {
             String err = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
             out.println(err);
             throw new IllegalStateException(err);
-        }
-        for (int i = 0; i < opr.getOperand(); i++) {
-            calcArgs.add(numbers.pop());
-        }
-        if (opr.equals(Operator.UNDO)) {
-            undo();
-        } else if (opr.equals(Operator.CLEAR)) {
-            numbers.clear();
         } else {
-            numbers.push(opr.apply(calcArgs));
+            if (opr.equals(Operator.UNDO)) {
+                undo();
+            } else {
+                BigDecimal result = opr.apply(workingDir, mamoPad);
+                if (result != null) {
+                    workingDir.push(result);
+                }
+            }
         }
-        return numbers;
+        return workingDir;
     }
 
     private void logHistory(Stack<BigDecimal> numbers) {

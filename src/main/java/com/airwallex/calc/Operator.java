@@ -1,53 +1,61 @@
 package com.airwallex.calc;
 
+import com.airwallex.mamo.MamoPad;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 public enum Operator {
 	ADD("+", 2) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return numList.get(1).add(numList.get(0), mc);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			BigDecimal tmp = workingDir.pop();
+			return workingDir.pop().add(tmp, mc);
 		}
 	},
 	SUBTRACT("-", 2) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return numList.get(1).subtract(numList.get(0), mc);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			BigDecimal tmp = workingDir.pop();
+			return workingDir.pop().subtract(tmp, mc);
 		}
 	},
 	MULTIPLY("*", 2) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return numList.get(1).multiply(numList.get(0), mc);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			BigDecimal tmp = workingDir.pop();
+			return workingDir.pop().multiply(tmp, mc);
 		}
 	},
 	DIVIDE("/", 2) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return numList.get(1).divide(numList.get(0), mc);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			BigDecimal tmp = workingDir.pop();
+			return workingDir.pop().divide(tmp, mc);
 		}
 	},
 	SQRT("sqrt", 1) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return numList.get(0).sqrt(mc);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			return workingDir.pop().sqrt(mc);
 		}
 	},
 	UNDO("undo", 0) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return new BigDecimal(0);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			return null;
 		}
 	},
 	CLEAR("clear", 0) {
 		@Override
-		public BigDecimal apply(List<BigDecimal> numList) {
-			return new BigDecimal(0);
+		public BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad) {
+			workingDir.clear();
+			return null;
 		}
 	};
 
@@ -67,7 +75,7 @@ public enum Operator {
 		return map.containsKey(ele);
 	}
 
-	public abstract BigDecimal apply(List<BigDecimal> numList);
+	public abstract BigDecimal apply(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad);
 
 	Operator(String operatorText, int operand) {
 		this.operatorText = operatorText;
@@ -86,4 +94,7 @@ public enum Operator {
 		return operand;
 	}
 
+	public boolean executable(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad){
+		return this.operand <= workingDir.size();
+	};
 }
