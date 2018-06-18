@@ -22,7 +22,7 @@ public class RPNTest {
     }
 
     private void assertResultEq(String expect, RPNCalculator rpn) {
-        assertEquals(expect, rpn.getWorkingDir().toString());
+        assertEquals(expect, rpn.getStackContents());
     }
 
     @Test

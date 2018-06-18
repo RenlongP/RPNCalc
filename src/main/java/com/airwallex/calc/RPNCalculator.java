@@ -4,23 +4,21 @@ import com.airwallex.common.Constant;
 import com.airwallex.common.ErrorCode;
 import com.airwallex.mamo.MamoPad;
 import com.airwallex.mamo.MamoPadImpl;
-import com.airwallex.override.MyStack;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.*;
 
 import static java.lang.System.err;
 import static java.lang.System.out;
 
 public class RPNCalculator {
 
-    private MyStack<BigDecimal> workingDir = new MyStack<>();
-    private MamoPad<MyStack<BigDecimal>> mamoPad = new MamoPadImpl();
+    private Stack<BigDecimal> workingDir = new Stack<>();
+    private MamoPad<Stack<BigDecimal>> mamoPad = new MamoPadImpl();
     private static final String DISPLAY_FORMAT = "#.##########";
     private static final List<String> EXIT_CMD = Arrays.asList("quit", "q");
 
@@ -52,7 +50,7 @@ public class RPNCalculator {
                 e.printStackTrace();
                 return -1;
             }
-            logHistory((MyStack<BigDecimal>) workingDir.clone());
+            logHistory((Stack<BigDecimal>) workingDir.clone());
             execPos += ele.length() + Constant.PARAM_DELIMITER.length();
         }
         printstack();
@@ -80,11 +78,28 @@ public class RPNCalculator {
     }
 
     private void printstack() {
-        String info = "stack: " + getWorkingDir().toString();
-        out.println(info);
+        out.println("stack: "+ getStackContents());
     }
 
-    public MyStack<BigDecimal> calc(MyStack<BigDecimal> numbers, Operator opr, int execPos) {
+    public String getStackContents() {
+        StringBuilder sb = new StringBuilder();
+        for (BigDecimal ele : getWorkingDir()) {
+            if (ele instanceof BigDecimal) {
+                BigDecimal d = new BigDecimal(ele.toString());
+                DecimalFormat format = new DecimalFormat(DISPLAY_FORMAT);
+                sb.append(format.format(d.setScale(10, RoundingMode.DOWN)));
+            } else {
+                sb.append(ele.toString());
+            }
+            sb.append(Constant.PARAM_DELIMITER);
+        }
+        if(sb.length()>0){
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
+    public Stack<BigDecimal> calc(Stack<BigDecimal> numbers, Operator opr, int execPos) {
         List<BigDecimal> calcArgs = new ArrayList<>();
         if (numbers.size() < opr.getOperand()) {
             String err = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
@@ -104,7 +119,7 @@ public class RPNCalculator {
         return numbers;
     }
 
-    private void logHistory(MyStack<BigDecimal> numbers) {
+    private void logHistory(Stack<BigDecimal> numbers) {
         getMamoPad().makeNote(numbers);
     }
 
@@ -117,15 +132,15 @@ public class RPNCalculator {
         this.setWorkingDir(getMamoPad().readLatest());
     }
 
-    public MyStack<BigDecimal> getWorkingDir() {
+    public Stack<BigDecimal> getWorkingDir() {
         return workingDir;
     }
 
-    public void setWorkingDir(MyStack<BigDecimal> workingDir) {
+    public void setWorkingDir(Stack<BigDecimal> workingDir) {
         this.workingDir = workingDir;
     }
 
-    public MamoPad<MyStack<BigDecimal>> getMamoPad() {
+    public MamoPad<Stack<BigDecimal>> getMamoPad() {
         return mamoPad;
     }
 }
