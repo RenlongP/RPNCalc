@@ -116,4 +116,9 @@ public class RPNTest {
         assertEquals("Operator {} (position: {}): insufficient parameters.",
                 ErrorCode.PARAMETER_INSUFFICIENT.getMessage());
     }
+    @Test
+    public void testRedunderedBlankSpace() {
+        rpn.exec("1  2 ");
+        assertResultEq("1 2", rpn);
+    }
 }

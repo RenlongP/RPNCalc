@@ -4,6 +4,8 @@ import com.airwallex.common.Constant;
 import com.airwallex.common.ErrorCode;
 import com.airwallex.mamo.MamoPad;
 import com.airwallex.mamo.MamoPadImpl;
+import com.airwallex.operate.OperateHandler;
+import com.airwallex.operate.Operator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -12,7 +14,6 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static java.lang.System.err;
 import static java.lang.System.out;
 
 public class RPNCalculator {
@@ -39,19 +40,21 @@ public class RPNCalculator {
 
         int execPos = 0;
         for (String ele : input.split(Constant.PARAM_DELIMITER)) {
-            Operator opr = Operator.find(ele);
-            try {
-                if (opr != null) {
-                    calc(opr, execPos);
-                } else {
-                    workingDir.push(new BigDecimal(ele));
+            if (StringUtils.isNotEmpty(ele)) {
+                Operator opr = Operator.find(ele);
+                try {
+                    if (opr != null) {
+                        calc(opr, execPos);
+                    } else {
+                        workingDir.push(new BigDecimal(ele));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return -1;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return -1;
+                logHistory((Stack<BigDecimal>) workingDir.clone());
+                execPos += ele.length() + Constant.PARAM_DELIMITER.length();
             }
-            logHistory((Stack<BigDecimal>) workingDir.clone());
-            execPos += ele.length() + Constant.PARAM_DELIMITER.length();
         }
         printstack();
 
@@ -65,7 +68,7 @@ public class RPNCalculator {
         } else {
             List<String> invalidEles = new LinkedList<>();
             for (String ele : input.split(Constant.PARAM_DELIMITER)) {
-                if (!Operator.isValidOperator(ele) && !NumberUtils.isNumber(ele)) {
+                if (StringUtils.isNotEmpty(ele) && !Operator.isValidOperator(ele) && !NumberUtils.isNumber(ele)) {
                     invalidEles.add(ele);
                 }
             }
@@ -99,36 +102,18 @@ public class RPNCalculator {
         return sb.toString();
     }
 
-    public Stack<BigDecimal> calc(Operator opr, int execPos) {
-        List<BigDecimal> calcArgs = new ArrayList<>();
+    public void calc(Operator opr, int execPos) {
         if (!opr.executable(workingDir, mamoPad)) {
             String err = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
             out.println(err);
             throw new IllegalStateException(err);
         } else {
-            if (opr.equals(Operator.UNDO)) {
-                undo();
-            } else {
-                BigDecimal result = opr.apply(workingDir, mamoPad);
-                if (result != null) {
-                    workingDir.push(result);
-                }
-            }
+            workingDir = OperateHandler.handle(workingDir, mamoPad, opr);
         }
-        return workingDir;
     }
 
     private void logHistory(Stack<BigDecimal> numbers) {
         getMamoPad().makeNote(numbers);
-    }
-
-    private void undo() {
-        if (getMamoPad().getSize() < 2) {
-            err.println("Undo operation failed since no enough record");
-            return;
-        }
-
-        this.setWorkingDir(getMamoPad().readLatest());
     }
 
     public Stack<BigDecimal> getWorkingDir() {
