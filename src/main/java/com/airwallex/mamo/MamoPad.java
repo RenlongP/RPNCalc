@@ -1,9 +1,9 @@
 package com.airwallex.mamo;
 
 public interface MamoPad<E> {
-    public void makeNote(E content);
+    void makeNote(E content);
 
-    public E readLatest();
+    E readLatest();
 
-    public int getSize();
+    int getSize();
 }

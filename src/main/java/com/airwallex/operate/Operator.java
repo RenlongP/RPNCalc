@@ -111,7 +111,7 @@ public enum Operator {
 
 	public boolean executable(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad){
 		return this.operand <= workingDir.size();
-	};
+	}
 
 	public Stack<BigDecimal> getResultStack(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad){return workingDir;}
 }

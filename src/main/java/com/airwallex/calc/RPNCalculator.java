@@ -14,14 +14,22 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 
-import static java.lang.System.out;
+import static java.lang.System.*;
 
 public class RPNCalculator {
 
-    private Stack<BigDecimal> workingDir = new Stack<>();
-    private MamoPad<Stack<BigDecimal>> mamoPad = new MamoPadImpl();
+    private Stack<BigDecimal> workingDir;
+    private MamoPad<Stack<BigDecimal>> mamoPad;
+    private DecimalFormat format;
     private static final String DISPLAY_FORMAT = "#.##########";
     private static final List<String> EXIT_CMD = Arrays.asList("quit", "q");
+
+    public RPNCalculator() {
+        this.workingDir = new Stack<>();
+        this.mamoPad = new MamoPadImpl();
+        this.format = new DecimalFormat(DISPLAY_FORMAT);
+        format.setRoundingMode(RoundingMode.DOWN);
+    }
 
     public int exec(String input) {
 
@@ -46,17 +54,17 @@ public class RPNCalculator {
                     if (opr != null) {
                         calc(opr, execPos);
                     } else {
-                        workingDir.push(new BigDecimal(ele));
+                        getWorkingDir().push(new BigDecimal(ele));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     return -1;
                 }
-                logHistory((Stack<BigDecimal>) workingDir.clone());
+                logHistory((Stack<BigDecimal>) getWorkingDir().clone());
                 execPos += ele.length() + Constant.PARAM_DELIMITER.length();
             }
         }
-        printstack();
+        printStack();
 
         return 0;
     }
@@ -80,21 +88,14 @@ public class RPNCalculator {
         return isValid;
     }
 
-    private void printstack() {
+    private void printStack() {
         out.println("stack: " + getStackContents());
     }
 
     public String getStackContents() {
         StringBuilder sb = new StringBuilder();
         for (BigDecimal ele : getWorkingDir()) {
-            if (ele instanceof BigDecimal) {
-                BigDecimal d = new BigDecimal(ele.toString());
-                DecimalFormat format = new DecimalFormat(DISPLAY_FORMAT);
-                sb.append(format.format(d.setScale(10, RoundingMode.DOWN)));
-            } else {
-                sb.append(ele.toString());
-            }
-            sb.append(Constant.PARAM_DELIMITER);
+            sb.append(this.format.format(ele)).append(Constant.PARAM_DELIMITER);
         }
         if (sb.length() > 0) {
             sb.deleteCharAt(sb.length() - 1);
@@ -102,13 +103,13 @@ public class RPNCalculator {
         return sb.toString();
     }
 
-    public void calc(Operator opr, int execPos) {
-        if (!opr.executable(workingDir, mamoPad)) {
-            String err = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
-            out.println(err);
-            throw new IllegalStateException(err);
+    public void calc(Operator opr, int execPos) throws Exception {
+        if (!opr.executable(getWorkingDir(), getMamoPad())) {
+            String msg = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
+            err.println(msg);
+            throw new IllegalStateException(msg);
         } else {
-            workingDir = OperateHandler.handle(workingDir, mamoPad, opr);
+            setWorkingDir(OperateHandler.handle(getWorkingDir(), getMamoPad(), opr));
         }
     }
 

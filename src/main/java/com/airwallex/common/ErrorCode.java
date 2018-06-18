@@ -8,11 +8,11 @@ public enum ErrorCode {
 
     private final String messagePattern;
 
-    private ErrorCode(String messagePattern) {
+    ErrorCode(String messagePattern) {
         this.messagePattern = messagePattern;
     }
 
-    public String getMessagePattern() {
+    private String getMessagePattern() {
         return messagePattern;
     }
 
