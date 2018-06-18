@@ -1,8 +1,8 @@
 package com.airwallex.mamo;
 
-import java.util.Stack;
+import java.util.LinkedList;
 
-public class MamoPadImpl<E> extends Stack<E> implements MamoPad<E> {
+public class MamoPadImpl<E> extends LinkedList<E> implements MamoPad<E> {
     @Override
     public void makeNote(E content) {
         this.push(content);

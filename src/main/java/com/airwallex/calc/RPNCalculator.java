@@ -18,14 +18,14 @@ import static java.lang.System.*;
 
 public class RPNCalculator {
 
-    private Stack<BigDecimal> workingDir;
-    private MamoPad<Stack<BigDecimal>> mamoPad;
+    private Deque<BigDecimal> workingDir;
+    private MamoPad<Deque<BigDecimal>> mamoPad;
     private DecimalFormat format;
     private static final String DISPLAY_FORMAT = "#.##########";
     private static final List<String> EXIT_CMD = Arrays.asList("quit", "q");
 
     public RPNCalculator() {
-        this.workingDir = new Stack<>();
+        this.workingDir = new LinkedList<>();
         this.mamoPad = new MamoPadImpl();
         this.format = new DecimalFormat(DISPLAY_FORMAT);
         format.setRoundingMode(RoundingMode.DOWN);
@@ -60,7 +60,7 @@ public class RPNCalculator {
                     e.printStackTrace();
                     return -1;
                 }
-                logHistory((Stack<BigDecimal>) getWorkingDir().clone());
+                logHistory((Deque<BigDecimal>) ((LinkedList) getWorkingDir()).clone());
                 execPos += ele.length() + Constant.PARAM_DELIMITER.length();
             }
         }
@@ -94,7 +94,8 @@ public class RPNCalculator {
 
     public String getStackContents() {
         StringBuilder sb = new StringBuilder();
-        for (BigDecimal ele : getWorkingDir()) {
+        for (int i = workingDir.size() - 1; i >= 0; i--) {
+            BigDecimal ele = (BigDecimal) ((LinkedList)workingDir).get(i);
             sb.append(this.format.format(ele)).append(Constant.PARAM_DELIMITER);
         }
         if (sb.length() > 0) {
@@ -113,19 +114,19 @@ public class RPNCalculator {
         }
     }
 
-    private void logHistory(Stack<BigDecimal> numbers) {
+    private void logHistory(Deque<BigDecimal> numbers) {
         getMamoPad().makeNote(numbers);
     }
 
-    public Stack<BigDecimal> getWorkingDir() {
+    public Deque<BigDecimal> getWorkingDir() {
         return workingDir;
     }
 
-    public void setWorkingDir(Stack<BigDecimal> workingDir) {
+    public void setWorkingDir(Deque<BigDecimal> workingDir) {
         this.workingDir = workingDir;
     }
 
-    public MamoPad<Stack<BigDecimal>> getMamoPad() {
+    public MamoPad<Deque<BigDecimal>> getMamoPad() {
         return mamoPad;
     }
 }
