@@ -103,7 +103,7 @@ public class RPNCalculator {
         return sb.toString();
     }
 
-    public void calc(Operator opr, int execPos) throws Exception {
+    public void calc(Operator opr, int execPos) {
         if (!opr.executable(getWorkingDir(), getMamoPad())) {
             String msg = ErrorCode.PARAMETER_INSUFFICIENT.getMessage(opr.getOperatorText(), execPos + 1);
             err.println(msg);

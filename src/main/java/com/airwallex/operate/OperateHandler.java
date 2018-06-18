@@ -10,6 +10,7 @@ import java.util.Stack;
 public class OperateHandler {
     private static final List<Operator> STACK_OPERS = Arrays.asList(Operator.UNDO, Operator.CLEAR);
 
+    private OperateHandler(){}
     public static Stack<BigDecimal> handle(Stack<BigDecimal> workingDir, MamoPad<Stack<BigDecimal>> mamoPad, Operator opr) {
         if(STACK_OPERS.contains(opr)){
             workingDir = opr.getResultStack(workingDir,mamoPad);
