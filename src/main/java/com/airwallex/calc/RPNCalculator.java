@@ -43,6 +43,7 @@ public class RPNCalculator {
             for (String errorMsg : errorMsgs) {
                 out.println(errorMsg);
             }
+            pintHelpInfo();
             return 0;
         }
 
@@ -67,6 +68,11 @@ public class RPNCalculator {
         printStack();
 
         return 0;
+    }
+
+    private void pintHelpInfo() {
+
+        out.println("Help Info.");
     }
 
     private boolean isValidInputString(String input, List<String> resultMsg) {
